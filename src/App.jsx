@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { PlayerProvider } from './context/PlayerContext.jsx';
 import { useTheme } from './hooks/useTheme.js';
 import { Header, TopBar } from './components/Header.jsx';
+import { ScrollProgress, useScrollReveal } from './components/Effects.jsx';
 import { AdSlot, Ticker } from './components/Widgets.jsx';
 import { Footer } from './components/Sections.jsx';
 import Home from './pages/Home.jsx';
@@ -49,10 +50,13 @@ function RouteEffects() {
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
+  const { pathname } = useLocation();
+  useScrollReveal();
 
   return (
     <PlayerProvider>
       <RouteEffects />
+      <ScrollProgress />
       <a href="#main" className="skip-link">
         Skip to content
       </a>
@@ -65,7 +69,7 @@ export default function App() {
             <AdSlot size="leaderboard" />
           </div>
         </div>
-        <main id="main">
+        <main id="main" key={pathname} className="page-enter">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/on-air" element={<OnAir />} />

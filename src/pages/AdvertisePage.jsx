@@ -34,7 +34,7 @@ function Diagram() {
   );
 }
 
-function QuoteForm({ picked, toggle }) {
+function QuoteForm({ picked, toggle, pkg, setPkg }) {
   const [state, setState] = useState('idle');
 
   const onSubmit = async (e) => {
@@ -45,7 +45,7 @@ function QuoteForm({ picked, toggle }) {
       const interests = AD_OPTIONS.filter((o) => picked.has(o.id)).map((o) => o.chip);
       await submitForm({
         subject: `Advertising quote request — ${fd.business}`,
-        data: { ...fd, mediaKit: fd.mediaKit ? 'Yes' : 'No', interests },
+        data: { ...fd, mediaKit: fd.mediaKit ? 'Yes' : 'No', interests, package: pkg || 'None selected' },
       });
       setState('sent');
     } catch {
@@ -94,6 +94,37 @@ function QuoteForm({ picked, toggle }) {
                   ))}
                 </div>
               </fieldset>
+              <fieldset className="fieldset">
+                <legend>Package (optional)</legend>
+                <div className="chips">
+                  {AD_PACKAGES.map((p) => (
+                    <button key={p.name} type="button" className={`chip-btn ${pkg === p.name ? 'is-active' : ''}`} aria-pressed={pkg === p.name} onClick={() => setPkg(pkg === p.name ? null : p.name)}>
+                      {p.name}{p.featured ? ' ★' : ''}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="summary" aria-live="polite">
+                <strong>Your selection</strong>
+                {picked.size === 0 && !pkg ? (
+                  <span className="muted small">Nothing selected yet — pick options or a package above.</span>
+                ) : (
+                  <ul className="summary__list">
+                    {AD_OPTIONS.filter((o) => picked.has(o.id)).map((o) => (
+                      <li key={o.id}>
+                        <span><b>{o.title}</b> <span className="muted small">· {o.spec}</span></span>
+                        <button type="button" aria-label={`Remove ${o.title}`} onClick={() => toggle(o.id)}>✕</button>
+                      </li>
+                    ))}
+                    {pkg && (
+                      <li>
+                        <span><b>{pkg}</b> <span className="muted small">· package · {AD_PACKAGES.find((x) => x.name === pkg)?.items.length} items</span></span>
+                        <button type="button" aria-label={`Remove ${pkg}`} onClick={() => setPkg(null)}>✕</button>
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
               <div className="field-row">
                 <label className="field">Your name<input name="name" required autoComplete="name" /></label>
                 <label className="field">Business<input name="business" required autoComplete="organization" /></label>
@@ -123,6 +154,7 @@ function QuoteForm({ picked, toggle }) {
 
 export default function AdvertisePage() {
   const [picked, setPicked] = useState(new Set(['web']));
+  const [pkg, setPkg] = useState(null);
   const toggle = (id) =>
     setPicked((s) => {
       const n = new Set(s);
@@ -218,7 +250,9 @@ export default function AdvertisePage() {
                 <ul className="package__list">
                   {p.items.map((i) => <li key={i}>✓ {i}</li>)}
                 </ul>
-                <a href="#start" className={`btn ${p.featured ? 'btn--gradient' : 'btn--ghost'}`}>Choose {p.short}</a>
+                <a href="#start" onClick={() => setPkg(p.name)} className={`btn ${p.featured ? 'btn--gradient' : 'btn--ghost'}`}>
+                  {pkg === p.name ? 'Selected ✓' : `Choose ${p.short}`}
+                </a>
               </div>
             ))}
           </div>
@@ -240,7 +274,7 @@ export default function AdvertisePage() {
         </div>
       </section>
 
-      <QuoteForm picked={picked} toggle={toggle} />
+      <QuoteForm picked={picked} toggle={toggle} pkg={pkg} setPkg={setPkg} />
 
       <section className="section section--tight-top">
         <div className="container">
