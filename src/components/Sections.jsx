@@ -334,8 +334,7 @@ export function Footer() {
         <div className="footer__bottom">
           <span>
             Classic 1220AM CFAJ Radio · St. Catharines, Ontario, Canada · © {new Date().getFullYear()} All rights reserved. ·{' '}
-            <Link to="/privacy-policy">Privacy policy</Link> · Website by{' '}
-            <a href="https://checksite.ca" target="_blank" rel="noopener noreferrer">CheckSite</a>
+            <Link to="/privacy-policy">Privacy policy</Link>
           </span>
           <nav aria-label="Footer" className="footer__nav">
             <Link to="/on-air">On Air</Link>
